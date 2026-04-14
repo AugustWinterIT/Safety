@@ -668,7 +668,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881
+  &copy; August Winter &amp; Sons, Inc. &mdash; 2323 N. Roemer Rd., Appleton, WI 54911 &middot; (920) 739-8881
 </footer>
 
 <!-- Success overlay -->
@@ -682,10 +682,10 @@
 
 <script>
   // =========================================================
-  // CONFIGURATION — Replace this URL with your Power Automate
-  // HTTP trigger URL after creating the flow.
+  // CONFIGURATION — Replace this URL with your Google Apps
+  // Script Web App URL after deploying the script.
   // =========================================================
-  const POWER_AUTOMATE_URL = 'https://default248ef9c6423a4b1a8f8a356d23bc00.ca.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2e07866da6324251b57de6dfac7362b9/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=s89iPveFKf942wbSdO9jOBvF4aXihjMeIE5t36sKALY';
+  const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbymzjifrUOA2JgGhdXSrZnjKmPqLlfQzwuUWgBhmQwz-Lxni1Oj8CGr_xkxmJZjzqGM/exec';
 
   document.getElementById('prequalForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -705,21 +705,12 @@
     payload.submission_date = new Date().toISOString();
 
     try {
-      // Use sendBeacon to avoid CORS preflight issues
-      const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
-      const sent = navigator.sendBeacon(POWER_AUTOMATE_URL, blob);
+      const response = await fetch(SUBMIT_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
 
-      if (sent) {
-        document.getElementById('successOverlay').classList.add('show');
-      } else {
-        // Fallback: try fetch without CORS
-        await fetch(POWER_AUTOMATE_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          mode: 'no-cors'
-        });
-        document.getElementById('successOverlay').classList.add('show');
-      }
+      document.getElementById('successOverlay').classList.add('show');
 
     } catch (err) {
       console.error('Submission error:', err);
