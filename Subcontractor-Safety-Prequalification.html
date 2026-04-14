@@ -677,15 +677,33 @@
     <div class="checkmark">✓</div>
     <h2>Submission Received</h2>
     <p>Thank you. Your safety prequalification has been submitted to August Winter &amp; Sons, Inc. for review.</p>
+    <button id="downloadPdfBtn" style="
+      margin-top: 1.25rem;
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      background: #1a1a1a;
+      border: none;
+      border-radius: 5px;
+      padding: 0.7rem 2rem;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+    ">Download PDF Copy</button>
   </div>
 </div>
+
+<!-- jsPDF library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 
 <script>
   // =========================================================
   // CONFIGURATION — Replace this URL with your Google Apps
   // Script Web App URL after deploying the script.
   // =========================================================
-  const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbymzjifrUOA2JgGhdXSrZnjKmPqLlfQzwuUWgBhmQwz-Lxni1Oj8CGr_xkxmJZjzqGM/exec';
+  const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbz0IHnlVrpn8QUgqsN3S-5xwzFRSLlRrzVOq1dkUJv31AICdI_ye-LuCam7NC2ZXfhc/exec';
+
+  let lastPayload = {};
 
   document.getElementById('prequalForm').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -694,15 +712,13 @@
     btn.disabled = true;
     btn.textContent = 'Submitting…';
 
-    // Gather all form data into a flat JSON object
     const fd = new FormData(this);
     const payload = {};
     for (const [key, value] of fd.entries()) {
       payload[key] = value;
     }
-
-    // Add submission timestamp
     payload.submission_date = new Date().toISOString();
+    lastPayload = payload;
 
     try {
       const response = await fetch(SUBMIT_URL, {
@@ -710,7 +726,21 @@
         body: JSON.stringify(payload)
       });
 
+      // Get the PreQual ID from the Apps Script response
+      try {
+        const result = await response.json();
+        if (result.prequal_id) {
+          payload.prequal_id = result.prequal_id;
+          lastPayload = payload;
+        }
+      } catch(jsonErr) {
+        // If response isn't JSON, generate a fallback ID
+        payload.prequal_id = 'PQ-' + Date.now().toString().slice(-6);
+        lastPayload = payload;
+      }
+
       document.getElementById('successOverlay').classList.add('show');
+      generatePDF(payload);
 
     } catch (err) {
       console.error('Submission error:', err);
@@ -720,6 +750,198 @@
       btn.textContent = 'Submit Prequalification';
     }
   });
+
+  document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+    generatePDF(lastPayload);
+  });
+
+  function generatePDF(data) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 50;
+    const contentW = pageW - margin * 2;
+    let y = 40;
+
+    const red = [204, 34, 41];
+    const dark = [26, 26, 26];
+    const white = [255, 255, 255];
+    const gray = [107, 107, 107];
+    const lightBg = [243, 241, 236];
+    const redBg = [254, 242, 241];
+
+    function checkPage(needed) {
+      if (y + needed > 740) { doc.addPage(); y = 40; }
+    }
+
+    // Header bar
+    doc.setFillColor(...dark);
+    doc.rect(0, 0, pageW, 70, 'F');
+    doc.setFillColor(...red);
+    doc.rect(0, 70, pageW, 5, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    doc.setTextColor(...white);
+    doc.text('AUGUST WINTER & SONS, INC.', pageW / 2, 30, { align: 'center' });
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Subcontractor Safety Prequalification', pageW / 2, 50, { align: 'center' });
+    y = 95;
+
+    // PreQual ID and Submission date
+    var pqId = data.prequal_id || '';
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...red);
+    doc.text(pqId, margin, y);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...gray);
+    var subDate = data.submission_date ? new Date(data.submission_date).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+    doc.text('Submitted: ' + subDate, pageW - margin, y, { align: 'right' });
+    y += 20;
+
+    function sectionHeader(title) {
+      checkPage(30);
+      doc.setFillColor(...dark);
+      doc.rect(margin, y, contentW, 22, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...white);
+      doc.text(title.toUpperCase(), margin + 10, y + 15);
+      y += 32;
+    }
+
+    function fieldRow(label, value, half) {
+      checkPage(32);
+      var xOff = half ? half.x : margin;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...gray);
+      doc.text(label.toUpperCase(), xOff, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(...dark);
+      doc.text(String(value || '\u2014'), xOff, y + 12);
+      if (!half || half.advance) y += 28;
+    }
+
+    function fieldPair(l1, v1, l2, v2) {
+      checkPage(32);
+      fieldRow(l1, v1, { x: margin, advance: false });
+      fieldRow(l2, v2, { x: margin + contentW / 2 + 5, advance: true });
+    }
+
+    // Company Information
+    sectionHeader('Company Information');
+    fieldRow('Company Name', data.company_name);
+    fieldPair('Type of Company', data.company_type, 'Type of Work Performed', data.work_type);
+    fieldRow('Street Address', data.street_address);
+    fieldPair('City / State / Zip', data.city_state_zip, 'Phone Number', data.phone);
+    fieldPair('Fax Number', data.fax, 'Principal Contact', data.principal_contact);
+    fieldPair('Email Address', data.email, 'Year Business Established', data.year_established);
+    fieldPair('States You Work In', data.states_work_in, 'Union Status', data.union_status);
+    fieldPair('Previous Company Name', data.previous_name, "Contractor's License #", data.contractor_license);
+    fieldRow('D&B #', data.duns_number);
+
+    // Safety Information
+    sectionHeader('Safety Information \u2014 OSHA 300 Log Data');
+
+    checkPage(140);
+    doc.setFillColor(...lightBg);
+    doc.rect(margin, y, contentW, 18, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...dark);
+    doc.text('METRIC', margin + 5, y + 12);
+    doc.text('LAST YEAR', margin + 240, y + 12);
+    doc.text('1ST PRIOR', margin + 340, y + 12);
+    doc.text('2ND PRIOR', margin + 430, y + 12);
+    y += 22;
+
+    var rows = [
+      ['Experience Modification Rate (EMR)', data.emr_last, data.emr_1prior, data.emr_2prior],
+      ['Total Fatalities (Col. G)', data.fatalities_last, data.fatalities_1prior, data.fatalities_2prior],
+      ['Total OSHA Recordable Incidents (H+I+J)', data.recordables_last, data.recordables_1prior, data.recordables_2prior],
+      ['Total Lost Work Day Incidents (Col. H)', data.lwdi_last, data.lwdi_1prior, data.lwdi_2prior],
+      ['Total OSHA Citations Received', data.citations_last, data.citations_1prior, data.citations_2prior],
+      ['Total Annual Hours Worked', data.hours_last, data.hours_1prior, data.hours_2prior]
+    ];
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    rows.forEach(function(r, i) {
+      checkPage(20);
+      if (i % 2 === 0) { doc.setFillColor(250, 249, 246); doc.rect(margin, y - 3, contentW, 18, 'F'); }
+      doc.setTextColor(...dark);
+      doc.text(r[0], margin + 5, y + 9);
+      doc.setTextColor(80, 80, 80);
+      doc.text(String(r[1] || '\u2014'), margin + 240, y + 9);
+      doc.text(String(r[2] || '\u2014'), margin + 340, y + 9);
+      doc.text(String(r[3] || '\u2014'), margin + 430, y + 9);
+      y += 18;
+    });
+    y += 10;
+
+    // Variance factors
+    checkPage(70);
+    doc.setFillColor(...redBg);
+    doc.rect(margin, y, contentW, 60, 'F');
+    doc.setFillColor(...red);
+    doc.rect(margin, y, 3, 60, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...red);
+    doc.text('FACTORS REQUIRING SAFETY DEPARTMENT VARIANCE', margin + 12, y + 14);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    ['Deaths', 'TRIR greater than 1.0', 'EMR greater than 1.0', 'OSHA Violations in the last 3 years'].forEach(function(f, i) {
+      doc.text('\u2022  ' + f, margin + 16, y + 28 + i * 11);
+    });
+    y += 75;
+
+    // Safety Programs
+    sectionHeader('Safety Programs & Controls');
+    [['Written Safety Program', data.written_safety_program],
+     ['Drug Screening Policy', data.drug_screening],
+     ['Safety Orientation & Training', data.safety_orientation],
+     ['Continuing Safety Education', data.continuing_education]
+    ].forEach(function(p) {
+      checkPage(22);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...dark);
+      doc.text(p[0], margin + 5, y + 5);
+      var ans = p[1] || '\u2014';
+      if (ans === 'Yes') doc.setTextColor(26, 122, 58);
+      else if (ans === 'No') doc.setTextColor(...red);
+      else doc.setTextColor(...gray);
+      doc.setFont('helvetica', 'bold');
+      doc.text(ans, margin + contentW - 10, y + 5, { align: 'right' });
+      doc.setDrawColor(228, 232, 237);
+      doc.line(margin, y + 12, margin + contentW, y + 12);
+      y += 22;
+    });
+    y += 10;
+
+    // Safety Contact
+    sectionHeader('Safety / Health Professional Contact');
+    fieldPair('Name', data.safety_contact_name, 'Title', data.safety_contact_title);
+    fieldPair('Phone Number', data.safety_contact_phone, 'Email Address', data.safety_contact_email);
+
+    // Page footers
+    var pageCount = doc.internal.getNumberOfPages();
+    for (var pg = 1; pg <= pageCount; pg++) {
+      doc.setPage(pg);
+      doc.setFontSize(7);
+      doc.setTextColor(...gray);
+      doc.text('August Winter & Sons, Inc. \u2014 Subcontractor Safety Prequalification \u2014 ' + pqId, margin, 760);
+      doc.text('Page ' + pg + ' of ' + pageCount, pageW - margin, 760, { align: 'right' });
+    }
+
+    var slug = (data.company_name || 'Subcontractor').replace(/[^a-zA-Z0-9]/g, '_');
+    doc.save(pqId + '_Safety_Prequal_' + slug + '.pdf');
+  }
 </script>
 
 </body>
