@@ -668,7 +668,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; 2323 N. Roemer Rd., Appleton, WI 54911 &middot; (920) 739-8881
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881
 </footer>
 
 <!-- Success overlay -->
@@ -701,7 +701,7 @@
   // CONFIGURATION — Replace this URL with your Google Apps
   // Script Web App URL after deploying the script.
   // =========================================================
-  const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbz0IHnlVrpn8QUgqsN3S-5xwzFRSLlRrzVOq1dkUJv31AICdI_ye-LuCam7NC2ZXfhc/exec';
+  const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbyhfQR-ccraMxEp6agzSQiUofZEl4XPmVqMrI-xZC3fXSTyhb6U0H-wzdNo1SAIz3A/exec';
 
   let lastPayload = {};
 
@@ -721,23 +721,25 @@
     lastPayload = payload;
 
     try {
-      const response = await fetch(SUBMIT_URL, {
+      // Step 1: Submit data (no-cors because Google Apps Script redirects)
+      await fetch(SUBMIT_URL, {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
+        mode: 'no-cors'
       });
 
-      // Get the PreQual ID from the Apps Script response
+      // Step 2: GET the last PreQual ID from the sheet (GET doesn't have CORS issues)
+      let prequalId = '';
       try {
-        const result = await response.json();
-        if (result.prequal_id) {
-          payload.prequal_id = result.prequal_id;
-          lastPayload = payload;
-        }
-      } catch(jsonErr) {
-        // If response isn't JSON, generate a fallback ID
-        payload.prequal_id = 'PQ-' + Date.now().toString().slice(-6);
-        lastPayload = payload;
+        const idResponse = await fetch(SUBMIT_URL);
+        const idResult = await idResponse.json();
+        if (idResult.prequal_id) prequalId = idResult.prequal_id;
+      } catch(idErr) {
+        console.error('Could not retrieve ID:', idErr);
       }
+
+      payload.prequal_id = prequalId;
+      lastPayload = payload;
 
       document.getElementById('successOverlay').classList.add('show');
       generatePDF(payload);
