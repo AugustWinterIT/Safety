@@ -414,7 +414,7 @@
   @media (max-width: 600px) {
     .field-grid { grid-template-columns: 1fr; }
     .title-bar h1 { font-size: 1.1rem; }
-    .header-logo { max-width: 280px; }
+    .header-logo { max-width: 380px; }
     .osha-table { font-size: 0.78rem; }
     .osha-table thead th { font-size: 0.68rem; padding: 0.4rem 0.25rem; }
     .osha-table tbody input { max-width: 70px; font-size: 0.82rem; padding: 0.35rem; }
@@ -705,15 +705,21 @@
     payload.submission_date = new Date().toISOString();
 
     try {
-      const response = await fetch(POWER_AUTOMATE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        mode: 'no-cors',
-        body: JSON.stringify(payload)
-      });
+      // Use sendBeacon to avoid CORS preflight issues
+      const blob = new Blob([JSON.stringify(payload)], { type: 'text/plain' });
+      const sent = navigator.sendBeacon(POWER_AUTOMATE_URL, blob);
 
-      // With no-cors we can't read the response, so assume success
-      document.getElementById('successOverlay').classList.add('show');
+      if (sent) {
+        document.getElementById('successOverlay').classList.add('show');
+      } else {
+        // Fallback: try fetch without CORS
+        await fetch(POWER_AUTOMATE_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          mode: 'no-cors'
+        });
+        document.getElementById('successOverlay').classList.add('show');
+      }
 
     } catch (err) {
       console.error('Submission error:', err);
