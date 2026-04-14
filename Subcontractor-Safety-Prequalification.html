@@ -669,7 +669,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ++
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ----
 </footer>
 
 <!-- Success overlay -->
@@ -769,105 +769,128 @@
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'pt', format: 'letter' });
     const pageW = doc.internal.pageSize.getWidth();
-    const margin = 50;
-    const contentW = pageW - margin * 2;
-    let y = 40;
+    const m = 40;
+    const cw = pageW - m * 2;
+    let y = 0;
 
     const red = [204, 34, 41];
-    const dark = [26, 26, 26];
+    const dark = [50, 50, 50];
+    const headerBg = [240, 240, 240];
     const white = [255, 255, 255];
-    const gray = [107, 107, 107];
-    const lightBg = [243, 241, 236];
-    const redBg = [254, 242, 241];
+    const gray = [120, 120, 120];
+    const lightBg = [248, 247, 244];
+    const redBg = [254, 245, 244];
+    const sectionBg = [60, 60, 60];
 
-    function checkPage(needed) {
-      if (y + needed > 740) { doc.addPage(); y = 40; }
-    }
-
-    // Header bar
-    doc.setFillColor(...dark);
-    doc.rect(0, 0, pageW, 70, 'F');
-    doc.setFillColor(...red);
-    doc.rect(0, 70, pageW, 5, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(...white);
-    doc.text('AUGUST WINTER & SONS, INC.', pageW / 2, 30, { align: 'center' });
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'normal');
-    doc.text('Subcontractor Safety Prequalification', pageW / 2, 50, { align: 'center' });
-    y = 95;
-
-    // PreQual ID and Submission date
     var pqId = data.prequal_id || '';
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(...red);
-    doc.text(pqId, margin, y);
+    var logoData = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCABxAfQDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6pooooAKKKKACiuK8Y/EKw0HUU0bTbW513xLKu6PSrABpAP70rH5Yl6ct+RrFTwr418WfvfGPiN9DsX6aT4fbYwHpJckbmPYhQBQB3Ot+JdD0Fd2t6xp2njGR9quUiz9AxGa5G4+NXw7t5Cj+KrFmH/ADyD yIfkrgVcak47MxqYalUd5xT+RcT4ZeCtPUyz6cm1ed1xcuVH5tiqtx4++HXhH/AESx1DTPtLfKLTSYxcTO3ptiBOfrRB8E/h7DIJD4bhncd7meaf8AR3IrstE8O6NoMXl6JpNhp6EYItbdIs/XaBmiVSUvidwp4elT+CKXojg31rx74y/deHdJ/wCES0l+DqWsIHuyvrHbA4U+7n8K6XwT4E0nwo1xdQeffaxdc3eqXr+bczn3Y9F/2RgV1dFQbBRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB//9k=';
+
+    // ---- Header: light gray bar with logo ----
+    doc.setFillColor(...headerBg);
+    doc.rect(0, 0, pageW, 52, 'F');
+    doc.setFillColor(...red);
+    doc.rect(0, 52, pageW, 3, 'F');
+    try { doc.addImage(logoData, 'JPEG', m, 6, 200, 40); } catch(e) {}
+    // Subtitle right-aligned
     doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...dark);
+    doc.text('Subcontractor Safety Prequalification', pageW - m, 28, { align: 'right' });
     doc.setFontSize(8);
     doc.setTextColor(...gray);
-    var subDate = data.submission_date ? new Date(data.submission_date).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
-    doc.text('Submitted: ' + subDate, pageW - margin, y, { align: 'right' });
-    y += 20;
+    var subDate = data.submission_date ? new Date(data.submission_date).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '';
+    doc.text(pqId + '  |  ' + subDate, pageW - m, 42, { align: 'right' });
+    y = 65;
 
-    function sectionHeader(title) {
-      checkPage(30);
-      doc.setFillColor(...dark);
-      doc.rect(margin, y, contentW, 22, 'F');
-      doc.setFont('helvetica', 'bold');
+    // ---- Helpers ----
+    function addHeader(pg) {
+      doc.setPage(pg);
+      doc.setFillColor(...headerBg);
+      doc.rect(0, 0, pageW, 52, 'F');
+      doc.setFillColor(...red);
+      doc.rect(0, 52, pageW, 3, 'F');
+      try { doc.addImage(logoData, 'JPEG', m, 6, 200, 40); } catch(e) {}
+      doc.setFont('helvetica', 'normal');
       doc.setFontSize(9);
-      doc.setTextColor(...white);
-      doc.text(title.toUpperCase(), margin + 10, y + 15);
-      y += 32;
+      doc.setTextColor(...dark);
+      doc.text('Subcontractor Safety Prequalification', pageW - m, 28, { align: 'right' });
+      doc.setFontSize(8);
+      doc.setTextColor(...gray);
+      doc.text(pqId + '  |  ' + subDate, pageW - m, 42, { align: 'right' });
     }
 
-    function fieldRow(label, value, half) {
-      checkPage(32);
-      var xOff = half ? half.x : margin;
+    function checkPage(needed) {
+      if (y + needed > 745) {
+        doc.addPage();
+        var pg = doc.internal.getNumberOfPages();
+        addHeader(pg);
+        y = 65;
+      }
+    }
+
+    function sect(title) {
+      checkPage(22);
+      doc.setFillColor(...sectionBg);
+      doc.rect(m, y, cw, 16, 'F');
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(7.5);
+      doc.setTextColor(...white);
+      doc.text(title.toUpperCase(), m + 6, y + 11);
+      y += 22;
+    }
+
+    function fld(label, value, half) {
+      checkPage(20);
+      var x = half ? half.x : m;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.5);
       doc.setTextColor(...gray);
-      doc.text(label.toUpperCase(), xOff, y);
+      doc.text(label.toUpperCase(), x, y);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setTextColor(...dark);
-      doc.text(String(value || '\u2014'), xOff, y + 12);
-      if (!half || half.advance) y += 28;
+      doc.text(String(value || '\u2014'), x, y + 10);
+      if (!half || half.advance) y += 20;
     }
 
-    function fieldPair(l1, v1, l2, v2) {
-      checkPage(32);
-      fieldRow(l1, v1, { x: margin, advance: false });
-      fieldRow(l2, v2, { x: margin + contentW / 2 + 5, advance: true });
+    function pair(l1, v1, l2, v2) {
+      checkPage(20);
+      fld(l1, v1, { x: m, advance: false });
+      fld(l2, v2, { x: m + cw / 2 + 5, advance: true });
     }
 
-    // Company Information
-    sectionHeader('Company Information');
-    fieldRow('Company Name', data.company_name);
-    fieldPair('Type of Company', data.company_type, 'Type of Work Performed', data.work_type);
-    fieldRow('Street Address', data.street_address);
-    fieldPair('City / State / Zip', data.city_state_zip, 'Phone Number', data.phone);
-    fieldPair('Fax Number', data.fax, 'Principal Contact', data.principal_contact);
-    fieldPair('Email Address', data.email, 'Year Business Established', data.year_established);
-    fieldPair('States You Work In', data.states_work_in, 'Union Status', data.union_status);
-    fieldPair('Previous Company Name', data.previous_name, "Contractor's License #", data.contractor_license);
-    fieldRow('D&B #', data.duns_number);
+    function triple(l1, v1, l2, v2, l3, v3) {
+      checkPage(20);
+      var third = cw / 3;
+      fld(l1, v1, { x: m, advance: false });
+      fld(l2, v2, { x: m + third + 3, advance: false });
+      fld(l3, v3, { x: m + third * 2 + 6, advance: true });
+    }
 
-    // Safety Information
-    sectionHeader('Safety Information \u2014 OSHA 300 Log Data');
+    // ===== COMPANY INFO =====
+    sect('Company Information');
+    pair('Company Name', data.company_name, 'Phone', data.phone);
+    pair('Type of Company', data.company_type, 'Type of Work Performed', data.work_type);
+    pair('Street Address', data.street_address, 'City / State / Zip', data.city_state_zip);
+    triple('Principal Contact', data.principal_contact, 'Email', data.email, 'Fax', data.fax);
+    triple('Year Established', data.year_established, 'States', data.states_work_in, 'Union Status', data.union_status);
+    triple('Previous Name', data.previous_name, "Contractor's License #", data.contractor_license, 'D&B #', data.duns_number);
 
-    checkPage(140);
+    // ===== OSHA TABLE =====
+    sect('Safety Information \u2014 OSHA 300 Log Data');
+    checkPage(110);
+
+    // Table header
     doc.setFillColor(...lightBg);
-    doc.rect(margin, y, contentW, 18, 'F');
+    doc.rect(m, y, cw, 14, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
+    doc.setFontSize(6.5);
     doc.setTextColor(...dark);
-    doc.text('METRIC', margin + 5, y + 12);
-    doc.text('LAST YEAR', margin + 240, y + 12);
-    doc.text('1ST PRIOR', margin + 340, y + 12);
-    doc.text('2ND PRIOR', margin + 430, y + 12);
-    y += 22;
+    doc.text('METRIC', m + 4, y + 10);
+    doc.text('LAST YEAR', m + 260, y + 10);
+    doc.text('1ST PRIOR', m + 355, y + 10);
+    doc.text('2ND PRIOR', m + 445, y + 10);
+    y += 16;
 
     var rows = [
       ['Experience Modification Rate (EMR)', data.emr_last, data.emr_1prior, data.emr_2prior],
@@ -878,75 +901,72 @@
       ['Total Annual Hours Worked', data.hours_last, data.hours_1prior, data.hours_2prior]
     ];
 
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    rows.forEach(function(r, i) {
-      checkPage(20);
-      if (i % 2 === 0) { doc.setFillColor(250, 249, 246); doc.rect(margin, y - 3, contentW, 18, 'F'); }
-      doc.setTextColor(...dark);
-      doc.text(r[0], margin + 5, y + 9);
-      doc.setTextColor(80, 80, 80);
-      doc.text(String(r[1] || '\u2014'), margin + 240, y + 9);
-      doc.text(String(r[2] || '\u2014'), margin + 340, y + 9);
-      doc.text(String(r[3] || '\u2014'), margin + 430, y + 9);
-      y += 18;
-    });
-    y += 10;
-
-    // Variance factors
-    checkPage(70);
-    doc.setFillColor(...redBg);
-    doc.rect(margin, y, contentW, 60, 'F');
-    doc.setFillColor(...red);
-    doc.rect(margin, y, 3, 60, 'F');
-    doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
-    doc.setTextColor(...red);
-    doc.text('FACTORS REQUIRING SAFETY DEPARTMENT VARIANCE', margin + 12, y + 14);
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(8.5);
-    ['Deaths', 'TRIR greater than 1.0', 'EMR greater than 1.0', 'OSHA Violations in the last 3 years'].forEach(function(f, i) {
-      doc.text('\u2022  ' + f, margin + 16, y + 28 + i * 11);
+    rows.forEach(function(r, i) {
+      if (i % 2 === 0) { doc.setFillColor(250, 249, 247); doc.rect(m, y - 2, cw, 14, 'F'); }
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...dark);
+      doc.text(r[0], m + 4, y + 8);
+      doc.setTextColor(80, 80, 80);
+      doc.text(String(r[1] || '\u2014'), m + 265, y + 8);
+      doc.text(String(r[2] || '\u2014'), m + 360, y + 8);
+      doc.text(String(r[3] || '\u2014'), m + 450, y + 8);
+      y += 14;
     });
-    y += 75;
+    y += 4;
 
-    // Safety Programs
-    sectionHeader('Safety Programs & Controls');
+    // Variance
+    doc.setFillColor(...redBg);
+    doc.rect(m, y, cw, 42, 'F');
+    doc.setFillColor(...red);
+    doc.rect(m, y, 2, 42, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    doc.setTextColor(...red);
+    doc.text('FACTORS REQUIRING SAFETY DEPARTMENT VARIANCE', m + 8, y + 10);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    ['Deaths', 'TRIR > 1.0', 'EMR > 1.0', 'OSHA Violations in last 3 years'].forEach(function(f, i) {
+      doc.text('\u2022 ' + f, m + 10, y + 22 + i * 8);
+    });
+    y += 50;
+
+    // ===== SAFETY PROGRAMS =====
+    sect('Safety Programs & Controls');
     [['Written Safety Program', data.written_safety_program],
      ['Drug Screening Policy', data.drug_screening],
      ['Safety Orientation & Training', data.safety_orientation],
      ['Continuing Safety Education', data.continuing_education]
     ].forEach(function(p) {
-      checkPage(22);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(9.5);
+      doc.setFontSize(8.5);
       doc.setTextColor(...dark);
-      doc.text(p[0], margin + 5, y + 5);
+      doc.text(p[0], m + 4, y + 4);
       var ans = p[1] || '\u2014';
       if (ans === 'Yes') doc.setTextColor(26, 122, 58);
       else if (ans === 'No') doc.setTextColor(...red);
       else doc.setTextColor(...gray);
       doc.setFont('helvetica', 'bold');
-      doc.text(ans, margin + contentW - 10, y + 5, { align: 'right' });
-      doc.setDrawColor(228, 232, 237);
-      doc.line(margin, y + 12, margin + contentW, y + 12);
-      y += 22;
+      doc.text(ans, m + cw - 6, y + 4, { align: 'right' });
+      doc.setDrawColor(230, 230, 230);
+      doc.line(m, y + 9, m + cw, y + 9);
+      y += 15;
     });
-    y += 10;
+    y += 6;
 
-    // Safety Contact
-    sectionHeader('Safety / Health Professional Contact');
-    fieldPair('Name', data.safety_contact_name, 'Title', data.safety_contact_title);
-    fieldPair('Phone Number', data.safety_contact_phone, 'Email Address', data.safety_contact_email);
+    // ===== SAFETY CONTACT =====
+    sect('Safety / Health Professional Contact');
+    pair('Name', data.safety_contact_name, 'Title', data.safety_contact_title);
+    pair('Phone', data.safety_contact_phone, 'Email', data.safety_contact_email);
 
-    // Page footers
+    // ---- Footer on every page ----
     var pageCount = doc.internal.getNumberOfPages();
     for (var pg = 1; pg <= pageCount; pg++) {
       doc.setPage(pg);
-      doc.setFontSize(7);
+      doc.setFontSize(6.5);
       doc.setTextColor(...gray);
-      doc.text('August Winter & Sons, Inc. \u2014 Subcontractor Safety Prequalification \u2014 ' + pqId, margin, 760);
-      doc.text('Page ' + pg + ' of ' + pageCount, pageW - margin, 760, { align: 'right' });
+      doc.text(pqId + ' \u2014 August Winter & Sons, Inc. \u2014 N850 Cty Rd CB, Appleton, WI 54914', m, 760);
+      doc.text('Page ' + pg + ' of ' + pageCount, pageW - m, 760, { align: 'right' });
     }
 
     var slug = (data.company_name || 'Subcontractor').replace(/[^a-zA-Z0-9]/g, '_');
@@ -959,7 +979,6 @@
     try {
       var pdfBase64 = doc.output('datauristring').split(',')[1];
       
-      // Create a hidden iframe and form to POST without CORS issues
       var iframe = document.createElement('iframe');
       iframe.name = 'pdfUploadFrame';
       iframe.style.display = 'none';
@@ -991,7 +1010,6 @@
       document.body.appendChild(form);
       form.submit();
 
-      // Clean up after a delay
       setTimeout(function() {
         document.body.removeChild(form);
         document.body.removeChild(iframe);
