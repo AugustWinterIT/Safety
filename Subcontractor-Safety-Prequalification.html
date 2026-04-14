@@ -668,7 +668,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881...|..||
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 +
 </footer>
 
 <!-- Success overlay -->
@@ -748,14 +748,26 @@
     btn.textContent = 'Submit Prequalification';
 
     document.getElementById('successOverlay').classList.add('show');
-    generatePDF(payload);
+    try {
+      generatePDF(payload);
+    } catch(pdfErr) {
+      console.log('Auto PDF error:', pdfErr.message);
+    }
   });
 
   document.getElementById('downloadPdfBtn').addEventListener('click', function() {
-    generatePDF(lastPayload);
+    try {
+      generatePDF(lastPayload);
+    } catch(e) {
+      alert('PDF error: ' + e.message);
+    }
   });
 
   function generatePDF(data) {
+    if (!window.jspdf) {
+      alert('PDF library is still loading. Please wait a moment and try again.');
+      return;
+    }
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'pt', format: 'letter' });
     const pageW = doc.internal.pageSize.getWidth();
@@ -940,7 +952,55 @@
     }
 
     var slug = (data.company_name || 'Subcontractor').replace(/[^a-zA-Z0-9]/g, '_');
-    doc.save(pqId + '_Safety_Prequal_' + slug + '.pdf');
+    var fileName = pqId + '_Safety_Prequal_' + slug + '.pdf';
+
+    // Save locally for the subcontractor
+    doc.save(fileName);
+
+    // Upload PDF to Google Drive via Apps Script using a hidden form
+    try {
+      var pdfBase64 = doc.output('datauristring').split(',')[1];
+      
+      // Create a hidden iframe and form to POST without CORS issues
+      var iframe = document.createElement('iframe');
+      iframe.name = 'pdfUploadFrame';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = SUBMIT_URL;
+      form.target = 'pdfUploadFrame';
+
+      var input1 = document.createElement('input');
+      input1.type = 'hidden';
+      input1.name = 'pdfData';
+      input1.value = pdfBase64;
+      form.appendChild(input1);
+
+      var input2 = document.createElement('input');
+      input2.type = 'hidden';
+      input2.name = 'fileName';
+      input2.value = fileName;
+      form.appendChild(input2);
+
+      var input3 = document.createElement('input');
+      input3.type = 'hidden';
+      input3.name = 'prequal_id';
+      input3.value = pqId;
+      form.appendChild(input3);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      // Clean up after a delay
+      setTimeout(function() {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
+      }, 10000);
+    } catch(uploadErr) {
+      console.log('PDF upload error:', uploadErr);
+    }
   }
 </script>
 
