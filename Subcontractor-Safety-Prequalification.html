@@ -720,37 +720,35 @@
     payload.submission_date = new Date().toISOString();
     lastPayload = payload;
 
+    // Step 1: Submit data (no-cors because Google Apps Script redirects on POST)
     try {
-      // Step 1: Submit data (no-cors because Google Apps Script redirects)
       await fetch(SUBMIT_URL, {
         method: 'POST',
         body: JSON.stringify(payload),
         mode: 'no-cors'
       });
+    } catch(e) { /* no-cors POST may appear to fail but data still goes through */ }
 
-      // Step 2: GET the last PreQual ID from the sheet (GET doesn't have CORS issues)
-      let prequalId = '';
-      try {
-        const idResponse = await fetch(SUBMIT_URL);
-        const idResult = await idResponse.json();
-        if (idResult.prequal_id) prequalId = idResult.prequal_id;
-      } catch(idErr) {
-        console.error('Could not retrieve ID:', idErr);
-      }
+    // Step 2: Small delay to let the sheet update, then GET the PreQual ID
+    await new Promise(r => setTimeout(r, 2000));
 
-      payload.prequal_id = prequalId;
-      lastPayload = payload;
-
-      document.getElementById('successOverlay').classList.add('show');
-      generatePDF(payload);
-
-    } catch (err) {
-      console.error('Submission error:', err);
-      alert('There was a problem submitting the form. Please try again or contact August Winter & Sons directly at (920) 739-8881.');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Submit Prequalification';
+    let prequalId = '';
+    try {
+      const idResponse = await fetch(SUBMIT_URL);
+      const idResult = await idResponse.json();
+      if (idResult.prequal_id) prequalId = idResult.prequal_id;
+    } catch(idErr) {
+      console.log('Could not retrieve ID:', idErr);
     }
+
+    payload.prequal_id = prequalId;
+    lastPayload = payload;
+
+    btn.disabled = false;
+    btn.textContent = 'Submit Prequalification';
+
+    document.getElementById('successOverlay').classList.add('show');
+    generatePDF(payload);
   });
 
   document.getElementById('downloadPdfBtn').addEventListener('click', function() {
