@@ -674,7 +674,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ^<>^
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 <>
 </footer>
 
 <!-- Success overlay -->
@@ -696,10 +696,33 @@
       cursor: pointer;
       letter-spacing: 0.03em;
     ">Download PDF Copy</button>
+    <br>
+    <button onclick="document.getElementById('successOverlay').style.display='none'; document.getElementById('prequalForm').reset(); window.scrollTo(0,0);" style="
+      font-family: 'Source Sans 3', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #666;
+      background: transparent;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 0.5rem 2rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      letter-spacing: 0.03em;
+    ">Close</button>
   </div>
 </div>
 
 <script>
+  // =========================================================
+  // PREVENT ENTER KEY FROM SUBMITTING — only the button submits
+  // =========================================================
+  document.getElementById('prequalForm').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
+      e.preventDefault();
+    }
+  });
+
   // =========================================================
   // PHONE FORMAT MASK — auto-formats to (___) ___-____
   // =========================================================
@@ -737,6 +760,12 @@
 
   document.getElementById('prequalForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    // Explicitly check all required fields and patterns
+    if (!this.checkValidity()) {
+      this.reportValidity();
+      return;
+    }
 
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
