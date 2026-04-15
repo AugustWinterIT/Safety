@@ -509,6 +509,14 @@
           <input type="text" name="previous_name" placeholder="If applicable">
         </div>
         <div class="field">
+          <label>Federal Tax ID (EIN) <span class="required">*</span></label>
+          <input type="text" name="ein" required placeholder="XX-XXXXXXX" maxlength="10" pattern="\d{2}-\d{7}" title="EIN format: XX-XXXXXXX (e.g. 39-1234567)" class="ein-mask">
+        </div>
+        <div class="field">
+          <label>AWS Vendor # <span style="font-weight:400;color:#888;">(if known)</span></label>
+          <input type="text" name="aws_vendor_number" placeholder="Check your POs from AWS">
+        </div>
+        <div class="field">
           <label>Contractor's License #</label>
           <input type="text" name="contractor_license">
         </div>
@@ -674,7 +682,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 <>.....
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ------==
 </footer>
 
 <!-- Success overlay -->
@@ -721,6 +729,21 @@
     if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA' && e.target.type !== 'submit') {
       e.preventDefault();
     }
+  });
+
+  // =========================================================
+  // EIN FORMAT MASK — auto-formats to XX-XXXXXXX
+  // =========================================================
+  document.querySelectorAll('.ein-mask').forEach(function(input) {
+    input.addEventListener('input', function(e) {
+      var x = e.target.value.replace(/\D/g, '');
+      if (x.length > 9) x = x.slice(0, 9);
+      if (x.length > 2) {
+        e.target.value = x.slice(0, 2) + '-' + x.slice(2);
+      } else {
+        e.target.value = x;
+      }
+    });
   });
 
   // =========================================================
@@ -905,6 +928,7 @@
     row3('City / State / Zip', data.city_state_zip, 'Principal Contact', data.principal_contact, 'Email Address', data.email);
     row2('Year Business Established', data.year_established, 'States We Do Work In', data.states_work_in);
     row2('Union / Non-Union', data.union_status, 'Previous Name of Company', data.previous_name);
+    row2('Federal Tax ID (EIN)', data.ein, 'AWS Vendor #', data.aws_vendor_number);
     row2("Contractor's License #", data.contractor_license, 'D&B #', data.duns_number);
 
     sect('Safety Information \u2014 OSHA 300 Log Data');
