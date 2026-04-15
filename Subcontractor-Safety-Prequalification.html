@@ -167,6 +167,11 @@
     box-shadow: 0 0 0 3px rgba(0,51,102,0.12);
   }
   .field input::placeholder { color: #aab4c0; }
+  .field input:invalid:not(:placeholder-shown):not(:focus),
+  .field select:invalid:not(:focus) {
+    border-color: var(--aws-red);
+    box-shadow: 0 0 0 2px rgba(204,34,41,0.12);
+  }
 
   /* ---- Radio row ---- */
   .radio-row {
@@ -453,28 +458,28 @@
           <input type="text" name="company_name" required>
         </div>
         <div class="field">
-          <label>Type of Company</label>
-          <input type="text" name="company_type" placeholder="e.g. Electrical, Mechanical, General">
+          <label>Type of Company <span class="required">*</span></label>
+          <input type="text" name="company_type" placeholder="e.g. Electrical, Mechanical, General" required>
         </div>
         <div class="field">
-          <label>Type of Work Performed</label>
-          <input type="text" name="work_type">
+          <label>Type of Work Performed <span class="required">*</span></label>
+          <input type="text" name="work_type" required>
         </div>
         <div class="field full">
-          <label>Street Address</label>
-          <input type="text" name="street_address">
+          <label>Street Address <span class="required">*</span></label>
+          <input type="text" name="street_address" required>
         </div>
         <div class="field">
-          <label>City / State / Zip</label>
-          <input type="text" name="city_state_zip">
+          <label>City / State / Zip <span class="required">*</span></label>
+          <input type="text" name="city_state_zip" required>
         </div>
         <div class="field">
           <label>Phone Number <span class="required">*</span></label>
-          <input type="tel" name="phone" required>
+          <input type="tel" name="phone" required placeholder="(___) ___-____" class="phone-mask">
         </div>
         <div class="field">
           <label>Fax Number</label>
-          <input type="tel" name="fax">
+          <input type="tel" name="fax" placeholder="(___) ___-____" class="phone-mask">
         </div>
         <div class="field">
           <label>Principal Contact <span class="required">*</span></label>
@@ -485,8 +490,8 @@
           <input type="email" name="email" required>
         </div>
         <div class="field">
-          <label>Year Business Established</label>
-          <input type="text" name="year_established" placeholder="e.g. 1998" maxlength="4">
+          <label>Year Business Established <span class="required">*</span></label>
+          <input type="text" name="year_established" placeholder="e.g. 1998" maxlength="4" pattern="\d{4}" title="Please enter a 4-digit year" required>
         </div>
         <div class="field">
           <label>States You Work In</label>
@@ -637,20 +642,20 @@
     <div class="section-body">
       <div class="field-grid">
         <div class="field">
-          <label>Name</label>
-          <input type="text" name="safety_contact_name">
+          <label>Name <span class="required">*</span></label>
+          <input type="text" name="safety_contact_name" required>
         </div>
         <div class="field">
-          <label>Title</label>
-          <input type="text" name="safety_contact_title">
+          <label>Title <span class="required">*</span></label>
+          <input type="text" name="safety_contact_title" required>
         </div>
         <div class="field">
-          <label>Phone Number</label>
-          <input type="tel" name="safety_contact_phone">
+          <label>Phone Number <span class="required">*</span></label>
+          <input type="tel" name="safety_contact_phone" required placeholder="(___) ___-____" class="phone-mask">
         </div>
         <div class="field">
-          <label>Email Address</label>
-          <input type="email" name="safety_contact_email">
+          <label>Email Address <span class="required">*</span></label>
+          <input type="email" name="safety_contact_email" required>
         </div>
       </div>
     </div>
@@ -669,7 +674,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 OOOOO
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ^<>^
 </footer>
 
 <!-- Success overlay -->
@@ -695,6 +700,33 @@
 </div>
 
 <script>
+  // =========================================================
+  // PHONE FORMAT MASK — auto-formats to (___) ___-____
+  // =========================================================
+  document.querySelectorAll('.phone-mask').forEach(function(input) {
+    input.addEventListener('input', function(e) {
+      var x = e.target.value.replace(/\D/g, '');
+      if (x.length > 10) x = x.slice(0, 10);
+      var formatted = '';
+      if (x.length > 0) formatted = '(' + x.slice(0, 3);
+      if (x.length >= 3) formatted += ') ' + x.slice(3, 6);
+      if (x.length >= 6) formatted += '-' + x.slice(6, 10);
+      e.target.value = formatted;
+    });
+    // Validate on form submit — must be complete (14 chars = "(920) 555-1234")
+    input.addEventListener('invalid', function() {
+      if (this.value && this.value.replace(/\D/g, '').length < 10) {
+        this.setCustomValidity('Please enter a complete 10-digit phone number');
+      } else {
+        this.setCustomValidity('');
+      }
+    });
+    input.addEventListener('input', function() { this.setCustomValidity(''); });
+    // Set pattern for validation (required fields only)
+    input.setAttribute('pattern', '\\(\\d{3}\\) \\d{3}-\\d{4}');
+    input.setAttribute('title', 'Phone format: (920) 555-1234');
+  });
+
   // =========================================================
   // CONFIGURATION — Replace this URL with your Google Apps
   // Script Web App URL after deploying the script.
