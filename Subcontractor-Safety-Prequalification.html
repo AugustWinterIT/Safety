@@ -550,39 +550,39 @@
           <tbody>
             <tr>
               <td>Experience Modification Rate (EMR)</td>
-              <td><input type="text" name="emr_last" inputmode="decimal"></td>
-              <td><input type="text" name="emr_1prior" inputmode="decimal"></td>
-              <td><input type="text" name="emr_2prior" inputmode="decimal"></td>
+              <td><input type="text" name="emr_last" required inputmode="decimal"></td>
+              <td><input type="text" name="emr_1prior" required inputmode="decimal"></td>
+              <td><input type="text" name="emr_2prior" required inputmode="decimal"></td>
             </tr>
             <tr>
               <td>Total Fatalities <span style="font-size:0.75rem;color:var(--text-muted);">(Col. G)</span></td>
-              <td><input type="text" name="fatalities_last" inputmode="numeric"></td>
-              <td><input type="text" name="fatalities_1prior" inputmode="numeric"></td>
-              <td><input type="text" name="fatalities_2prior" inputmode="numeric"></td>
+              <td><input type="text" name="fatalities_last" required inputmode="numeric"></td>
+              <td><input type="text" name="fatalities_1prior" required inputmode="numeric"></td>
+              <td><input type="text" name="fatalities_2prior" required inputmode="numeric"></td>
             </tr>
             <tr>
               <td>Total OSHA Recordable Incidents <span style="font-size:0.75rem;color:var(--text-muted);">(Cols. H+I+J)</span></td>
-              <td><input type="text" name="recordables_last" inputmode="numeric"></td>
-              <td><input type="text" name="recordables_1prior" inputmode="numeric"></td>
-              <td><input type="text" name="recordables_2prior" inputmode="numeric"></td>
+              <td><input type="text" name="recordables_last" required inputmode="numeric"></td>
+              <td><input type="text" name="recordables_1prior" required inputmode="numeric"></td>
+              <td><input type="text" name="recordables_2prior" required inputmode="numeric"></td>
             </tr>
             <tr>
               <td>Total Lost Work Day Incidents <span style="font-size:0.75rem;color:var(--text-muted);">(Col. H)</span></td>
-              <td><input type="text" name="lwdi_last" inputmode="numeric"></td>
-              <td><input type="text" name="lwdi_1prior" inputmode="numeric"></td>
-              <td><input type="text" name="lwdi_2prior" inputmode="numeric"></td>
+              <td><input type="text" name="lwdi_last" required inputmode="numeric"></td>
+              <td><input type="text" name="lwdi_1prior" required inputmode="numeric"></td>
+              <td><input type="text" name="lwdi_2prior" required inputmode="numeric"></td>
             </tr>
             <tr>
               <td>Total OSHA Citations Received</td>
-              <td><input type="text" name="citations_last" inputmode="numeric"></td>
-              <td><input type="text" name="citations_1prior" inputmode="numeric"></td>
-              <td><input type="text" name="citations_2prior" inputmode="numeric"></td>
+              <td><input type="text" name="citations_last" required inputmode="numeric"></td>
+              <td><input type="text" name="citations_1prior" required inputmode="numeric"></td>
+              <td><input type="text" name="citations_2prior" required inputmode="numeric"></td>
             </tr>
             <tr>
               <td>Total Annual Hours Worked</td>
-              <td><input type="text" name="hours_last" inputmode="numeric"></td>
-              <td><input type="text" name="hours_1prior" inputmode="numeric"></td>
-              <td><input type="text" name="hours_2prior" inputmode="numeric"></td>
+              <td><input type="text" name="hours_last" required inputmode="numeric"></td>
+              <td><input type="text" name="hours_1prior" required inputmode="numeric"></td>
+              <td><input type="text" name="hours_2prior" required inputmode="numeric"></td>
             </tr>
           </tbody>
         </table>
@@ -613,28 +613,28 @@
         <div class="checklist-item">
           <span class="checklist-label">Has a Written Safety Program</span>
           <div class="checklist-options">
-            <label><input type="radio" name="written_safety_program" value="Yes"> Yes</label>
+            <label><input type="radio" name="written_safety_program" value="Yes" required> Yes</label>
             <label><input type="radio" name="written_safety_program" value="No"> No</label>
           </div>
         </div>
         <div class="checklist-item">
           <span class="checklist-label">Has an Implemented Drug Screening Policy for all Employees</span>
           <div class="checklist-options">
-            <label><input type="radio" name="drug_screening" value="Yes"> Yes</label>
+            <label><input type="radio" name="drug_screening" value="Yes" required> Yes</label>
             <label><input type="radio" name="drug_screening" value="No"> No</label>
           </div>
         </div>
         <div class="checklist-item">
           <span class="checklist-label">Performs Safety Orientation &amp; Training for all Employees</span>
           <div class="checklist-options">
-            <label><input type="radio" name="safety_orientation" value="Yes"> Yes</label>
+            <label><input type="radio" name="safety_orientation" value="Yes" required> Yes</label>
             <label><input type="radio" name="safety_orientation" value="No"> No</label>
           </div>
         </div>
         <div class="checklist-item">
           <span class="checklist-label">Performs Continuing Safety Education for all Employees</span>
           <div class="checklist-options">
-            <label><input type="radio" name="continuing_education" value="Yes"> Yes</label>
+            <label><input type="radio" name="continuing_education" value="Yes" required> Yes</label>
             <label><input type="radio" name="continuing_education" value="No"> No</label>
           </div>
         </div>
@@ -682,7 +682,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ------oo==
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ...><
 </footer>
 
 <!-- Success overlay -->
@@ -1041,8 +1041,7 @@
       doc.text('Page ' + pg + ' of ' + pageCount, pageW - m, 760, { align: 'right' });
     }
 
-    var slug = (data.company_name || 'Subcontractor').replace(/[^a-zA-Z0-9]/g, '_');
-    var fileName = pqId + '_Safety_Prequal_' + slug + '.pdf';
+    var fileName = pqId + '.pdf';
     doc.save(fileName);
 
     try {
