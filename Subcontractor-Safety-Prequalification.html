@@ -145,7 +145,11 @@
   }
   .field label .required {
     color: var(--aws-red);
-    margin-left: 2px;
+    margin-left: 3px;
+    font-size: 2em;
+    font-weight: 700;
+    vertical-align: middle;
+    line-height: 0;
   }
   .field input,
   .field select,
@@ -153,7 +157,7 @@
     font-family: 'Source Sans 3', sans-serif;
     font-size: 0.92rem;
     padding: 0.6rem 0.75rem;
-    border: 1px solid var(--border);
+    border: 2px solid var(--aws-red);
     border-radius: 5px;
     background: var(--input-bg);
     color: var(--text);
@@ -166,19 +170,27 @@
     border-color: var(--aws-dark);
     box-shadow: 0 0 0 3px rgba(0,51,102,0.12);
   }
-  .field input::placeholder { color: #aab4c0; }
-  .field input:invalid:not(:placeholder-shown):not(:focus),
-  .field select:invalid:not(:focus) {
-    border-color: var(--aws-red);
-    box-shadow: 0 0 0 2px rgba(204,34,41,0.12);
+  .field input.filled,
+  .field select.filled,
+  .field textarea.filled {
+    border-color: #999;
   }
+  .field input::placeholder { color: #aab4c0; }
+
 
   /* ---- Radio row ---- */
   .radio-row {
     display: flex;
     gap: 1.25rem;
     align-items: center;
-    padding-top: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--aws-red);
+    border-radius: 5px;
+    background: var(--input-bg);
+    transition: border-color 0.2s;
+  }
+  .radio-row.filled {
+    border-color: #999;
   }
   .radio-row label {
     display: flex;
@@ -240,7 +252,7 @@
     font-family: 'Source Sans 3', sans-serif;
     font-size: 0.88rem;
     padding: 0.45rem;
-    border: 1px solid var(--border);
+    border: 2px solid var(--aws-red);
     border-radius: 4px;
     background: var(--input-bg);
     color: var(--text);
@@ -250,6 +262,9 @@
     outline: none;
     border-color: var(--aws-dark);
     box-shadow: 0 0 0 3px rgba(0,51,102,0.12);
+  }
+  .osha-table tbody input.filled {
+    border-color: #999;
   }
 
   /* ---- Checklist ---- */
@@ -271,6 +286,14 @@
     display: flex;
     gap: 0.75rem;
     flex-shrink: 0;
+    padding: 0.4rem 0.75rem;
+    border: 2px solid var(--aws-red);
+    border-radius: 5px;
+    background: var(--input-bg);
+    transition: border-color 0.2s;
+  }
+  .checklist-options.filled {
+    border-color: #999;
   }
   .checklist-options label {
     display: flex;
@@ -494,13 +517,13 @@
           <input type="text" name="year_established" placeholder="e.g. 1998" maxlength="4" pattern="\d{4}" title="Please enter a 4-digit year" required>
         </div>
         <div class="field">
-          <label>States You Work In</label>
-          <input type="text" name="states_work_in" placeholder="e.g. WI, MN, IL">
+          <label>States You Work In <span class="required">*</span></label>
+          <input type="text" name="states_work_in" placeholder="e.g. WI, MN, IL" required>
         </div>
         <div class="field">
-          <label>Union or Non-Union</label>
+          <label>Union or Non-Union <span class="required">*</span></label>
           <div class="radio-row">
-            <label><input type="radio" name="union_status" value="Union"> Union</label>
+            <label><input type="radio" name="union_status" value="Union" required> Union</label>
             <label><input type="radio" name="union_status" value="Non-Union"> Non-Union</label>
           </div>
         </div>
@@ -535,7 +558,7 @@
     </div>
     <div class="section-body">
       <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:0.75rem;">
-        List your Company's injuries/illnesses from your OSHA 300 Logs for the most recent three years.
+        List your Company's injuries/illnesses from your OSHA 300 Logs for the most recent three years. <span style="color:#cc2229;font-size:2em;font-weight:700;vertical-align:middle;line-height:0;">*</span>
       </p>
       <div style="overflow-x:auto;">
         <table class="osha-table">
@@ -550,39 +573,39 @@
           <tbody>
             <tr>
               <td>Experience Modification Rate (EMR)</td>
-              <td><input type="text" name="emr_last" required inputmode="decimal"></td>
-              <td><input type="text" name="emr_1prior" required inputmode="decimal"></td>
-              <td><input type="text" name="emr_2prior" required inputmode="decimal"></td>
+              <td><input type="number" name="emr_last" required step="any" min="0"></td>
+              <td><input type="number" name="emr_1prior" required step="any" min="0"></td>
+              <td><input type="number" name="emr_2prior" required step="any" min="0"></td>
             </tr>
             <tr>
               <td>Total Fatalities <span style="font-size:0.75rem;color:var(--text-muted);">(Col. G)</span></td>
-              <td><input type="text" name="fatalities_last" required inputmode="numeric"></td>
-              <td><input type="text" name="fatalities_1prior" required inputmode="numeric"></td>
-              <td><input type="text" name="fatalities_2prior" required inputmode="numeric"></td>
+              <td><input type="number" name="fatalities_last" required step="1" min="0"></td>
+              <td><input type="number" name="fatalities_1prior" required step="1" min="0"></td>
+              <td><input type="number" name="fatalities_2prior" required step="1" min="0"></td>
             </tr>
             <tr>
-              <td>Total OSHA Recordable Incidents <span style="font-size:0.75rem;color:var(--text-muted);">(Cols. H+I+J)</span></td>
-              <td><input type="text" name="recordables_last" required inputmode="numeric"></td>
-              <td><input type="text" name="recordables_1prior" required inputmode="numeric"></td>
-              <td><input type="text" name="recordables_2prior" required inputmode="numeric"></td>
+              <td>Total OSHA Recordable Incidents <span style="font-size:0.75rem;color:var(--text-muted);">(Cols. I + J)</span></td>
+              <td><input type="number" name="recordables_last" required step="1" min="0"></td>
+              <td><input type="number" name="recordables_1prior" required step="1" min="0"></td>
+              <td><input type="number" name="recordables_2prior" required step="1" min="0"></td>
             </tr>
             <tr>
               <td>Total Lost Work Day Incidents <span style="font-size:0.75rem;color:var(--text-muted);">(Col. H)</span></td>
-              <td><input type="text" name="lwdi_last" required inputmode="numeric"></td>
-              <td><input type="text" name="lwdi_1prior" required inputmode="numeric"></td>
-              <td><input type="text" name="lwdi_2prior" required inputmode="numeric"></td>
+              <td><input type="number" name="lwdi_last" required step="1" min="0"></td>
+              <td><input type="number" name="lwdi_1prior" required step="1" min="0"></td>
+              <td><input type="number" name="lwdi_2prior" required step="1" min="0"></td>
             </tr>
             <tr>
               <td>Total OSHA Citations Received</td>
-              <td><input type="text" name="citations_last" required inputmode="numeric"></td>
-              <td><input type="text" name="citations_1prior" required inputmode="numeric"></td>
-              <td><input type="text" name="citations_2prior" required inputmode="numeric"></td>
+              <td><input type="number" name="citations_last" required step="1" min="0"></td>
+              <td><input type="number" name="citations_1prior" required step="1" min="0"></td>
+              <td><input type="number" name="citations_2prior" required step="1" min="0"></td>
             </tr>
             <tr>
               <td>Total Annual Hours Worked</td>
-              <td><input type="text" name="hours_last" required inputmode="numeric"></td>
-              <td><input type="text" name="hours_1prior" required inputmode="numeric"></td>
-              <td><input type="text" name="hours_2prior" required inputmode="numeric"></td>
+              <td><input type="number" name="hours_last" required step="1" min="0"></td>
+              <td><input type="number" name="hours_1prior" required step="1" min="0"></td>
+              <td><input type="number" name="hours_2prior" required step="1" min="0"></td>
             </tr>
           </tbody>
         </table>
@@ -607,7 +630,7 @@
     </div>
     <div class="section-body">
       <p style="font-size:0.84rem; color:var(--text-muted); margin-bottom:0.5rem;">
-        Please indicate whether your company implements the following safety controls.
+        Please indicate whether your company implements the following safety controls. <span style="color:#cc2229;font-size:2em;font-weight:700;vertical-align:middle;line-height:0;">*</span>
       </p>
       <div>
         <div class="checklist-item">
@@ -682,7 +705,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881 ...><><>...
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881...
 </footer>
 
 <!-- Success overlay -->
@@ -722,6 +745,34 @@
 </div>
 
 <script>
+  // =========================================================
+  // FIELD BORDER STATES — red when empty, black on focus, grey when filled
+  // Optional fields start grey instead of red
+  // =========================================================
+  // Toggle 'filled' class on all inputs when they have a value
+  document.querySelectorAll('.field input, .field select, .field textarea, .osha-table input').forEach(function(input) {
+    function checkFilled() {
+      if (input.value && input.value.trim() !== '') {
+        input.classList.add('filled');
+      } else {
+        input.classList.remove('filled');
+      }
+    }
+    input.addEventListener('input', checkFilled);
+    input.addEventListener('change', checkFilled);
+    checkFilled(); // check initial state
+  });
+
+  // Toggle 'filled' class on radio button containers when a selection is made
+  document.querySelectorAll('.radio-row, .checklist-options').forEach(function(container) {
+    var radios = container.querySelectorAll('input[type="radio"]');
+    radios.forEach(function(radio) {
+      radio.addEventListener('change', function() {
+        container.classList.add('filled');
+      });
+    });
+  });
+
   // =========================================================
   // PREVENT ENTER KEY FROM SUBMITTING — only the button submits
   // =========================================================
@@ -955,7 +1006,7 @@
     var rows = [
       ['Experience Modification Rate (EMR)', data.emr_last, data.emr_1prior, data.emr_2prior],
       ['Total # of Fatalities (Col. G)', data.fatalities_last, data.fatalities_1prior, data.fatalities_2prior],
-      ['Total # of OSHA Recordable Incidents (H+I+J)', data.recordables_last, data.recordables_1prior, data.recordables_2prior],
+      ['Total # of OSHA Recordable Incidents (I + J)', data.recordables_last, data.recordables_1prior, data.recordables_2prior],
       ['Total # of Lost Work Day Incidents (Col. H)', data.lwdi_last, data.lwdi_1prior, data.lwdi_2prior],
       ['Total # of OSHA Citations Received', data.citations_last, data.citations_1prior, data.citations_2prior],
       ['Total # of Annual Hours Worked', data.hours_last, data.hours_1prior, data.hours_2prior]
