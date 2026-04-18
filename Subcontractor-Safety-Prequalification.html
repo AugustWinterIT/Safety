@@ -705,7 +705,7 @@
 </form>
 
 <footer class="footer">
-  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881...
+  &copy; August Winter &amp; Sons, Inc. &mdash; N850 Cty Rd CB, Appleton, WI 54914 &middot; (920) 739-8881
 </footer>
 
 <!-- Success overlay -->
@@ -728,7 +728,16 @@
       letter-spacing: 0.03em;
     ">Download PDF Copy</button>
     <br>
-    <button onclick="document.getElementById('successOverlay').style.display='none'; document.getElementById('prequalForm').reset(); window.scrollTo(0,0);" style="
+    <button onclick="
+      var closed = false;
+      try { window.close(); closed = true; } catch(e) {}
+      setTimeout(function() {
+        document.getElementById('successOverlay').style.display='none';
+        document.getElementById('prequalForm').reset();
+        document.querySelectorAll('.filled').forEach(function(el) { el.classList.remove('filled'); });
+        window.scrollTo(0,0);
+      }, 300);
+    " style="
       font-family: 'Source Sans 3', sans-serif;
       font-size: 0.88rem;
       font-weight: 500;
@@ -1006,7 +1015,7 @@
     var rows = [
       ['Experience Modification Rate (EMR)', data.emr_last, data.emr_1prior, data.emr_2prior],
       ['Total # of Fatalities (Col. G)', data.fatalities_last, data.fatalities_1prior, data.fatalities_2prior],
-      ['Total # of OSHA Recordable Incidents (I + J)', data.recordables_last, data.recordables_1prior, data.recordables_2prior],
+      ['Total # of OSHA Recordable Incidents (Cols. I + J)', data.recordables_last, data.recordables_1prior, data.recordables_2prior],
       ['Total # of Lost Work Day Incidents (Col. H)', data.lwdi_last, data.lwdi_1prior, data.lwdi_2prior],
       ['Total # of OSHA Citations Received', data.citations_last, data.citations_1prior, data.citations_2prior],
       ['Total # of Annual Hours Worked', data.hours_last, data.hours_1prior, data.hours_2prior]
