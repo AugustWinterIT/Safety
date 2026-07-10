@@ -1104,26 +1104,6 @@
     var fileName = pqId + '.pdf';
     doc.save(fileName);
 
-    try {
-      var pdfBase64 = doc.output('datauristring').split(',')[1];
-      var iframe = document.createElement('iframe');
-      iframe.name = 'pdfUploadFrame'; iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-      var form = document.createElement('form');
-      form.method = 'POST'; form.action = SUBMIT_URL; form.target = 'pdfUploadFrame';
-      var input1 = document.createElement('input');
-      input1.type = 'hidden'; input1.name = 'pdfData'; input1.value = pdfBase64;
-      form.appendChild(input1);
-      var input2 = document.createElement('input');
-      input2.type = 'hidden'; input2.name = 'fileName'; input2.value = fileName;
-      form.appendChild(input2);
-      var input3 = document.createElement('input');
-      input3.type = 'hidden'; input3.name = 'prequal_id'; input3.value = pqId;
-      form.appendChild(input3);
-      document.body.appendChild(form);
-      form.submit();
-      setTimeout(function() { document.body.removeChild(form); document.body.removeChild(iframe); }, 10000);
-    } catch(uploadErr) { console.log('PDF upload error:', uploadErr); }
   }</script>
 
 </body>
